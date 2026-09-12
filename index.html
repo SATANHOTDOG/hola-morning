@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HOLA大墩 晨會靈魂超度儀表板 v4.0</title>
+    <title>HOLA大墩 晨會靈魂超度儀表板 v4.1</title>
     <style>
         /* --- 螢幕操作介面 --- */
         body { font-family: "Microsoft JhengHei", sans-serif; background-color: #1e1e1e; color: #d4d4d4; margin: 0; padding: 20px; }
@@ -20,28 +20,31 @@
         .btn-load { background: #d7ba7d; color: black; }
         .control-panel { background: #252526; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #3c3c3c; }
 
-        /* --- A4 實體預覽與列印專用樣式 --- */
+        /* --- A4 實體預覽與列印專用樣式 (完美契合原版比例) --- */
         #print-preview-area { display: none; }
         
         @media print {
             body { background: none; color: black; padding: 0; margin: 0; }
             .no-print { display: none !important; }
             #print-preview-area { display: block !important; }
-            @page { size: A4; margin: 5mm; }
+            @page { size: A4; margin: 8mm 10mm; }
 
             .a4-page {
-                width: 200mm;
-                height: 287mm;
+                width: 190mm;
+                height: 281mm;
                 margin: 0 auto;
                 position: relative;
                 page-break-after: always;
                 box-sizing: border-box;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between; /* 讓上下兩半部完美撐開對齊原版 */
             }
 
             .half-sheet {
-                height: 138mm;
+                height: 135mm;
                 position: relative;
-                overflow: hidden;
+                box-sizing: border-box;
             }
 
             .fake-table {
@@ -55,14 +58,15 @@
             }
             .fake-table td, .fake-table th {
                 border: 1px solid black;
-                padding: 4px 6px;
+                padding: 5px 8px;
                 text-align: center;
-                height: 26px;
+                height: 28px;
             }
+            /* 讓宣達事項的空白行高拉開，跟原版紙張一致 */
             .fake-table .note-row td {
                 text-align: left;
-                height: 24px;
-                font-size: 12px;
+                height: 32px;
+                font-size: 13px;
                 color: blue;
                 font-family: 'Kaiti', '標楷體', serif;
             }
@@ -70,6 +74,7 @@
                 text-align: left !important;
                 padding-left: 15px !important;
                 font-size: 14px;
+                height: 32px !important;
             }
             .val-text {
                 color: blue;
@@ -100,10 +105,10 @@
 
 <!-- 控制台與輸入介面 -->
 <div class="container no-print">
-    <h2>HOLA 晨會資料注射器 v4.0</h2>
+    <h2>HOLA 晨會資料注射器 v4.1</h2>
     
     <div class="control-panel">
-        <div style="font-weight: bold; margin-bottom: 8px; color: #d7ba7d;">📂 歷史記憶庫 (免寫後端查詢)</div>
+        <div style="font-weight: bold; margin-bottom: 8px; color: #d7ba7d;">📂 歷史記憶庫</div>
         <div style="display: flex; gap: 10px;">
             <select id="historyList" style="flex: 2;"><option value="">-- 選擇先前暫存的日期紀錄 --</option></select>
             <button class="btn-load" onclick="loadHistoryData()">載入此筆資料</button>
@@ -160,7 +165,6 @@
         </div>
     </div>
     
-    <!-- 螢幕即時預覽區 -->
     <div class="preview-screen-box">
         <div class="screen-sheet">
             <h3>🖥️ A4 上半部預覽</h3>
@@ -172,14 +176,13 @@
         </div>
     </div>
 
-    <button class="btn-print" onclick="window.print()" style="width: 100%; padding: 15px; font-size: 18px;">🖨️ 確認無誤，開始列印整張 A4</button>
+    <button class="btn-print" onclick="window.print()" style="width: 100%; padding: 15px; font-size: 18px;">🖨️ 確認無誤，開始列印精準 A4 版面</button>
 </div>
 
-<!-- ================= 實際列印輸出的隱形 A4畫布 ================= -->
+<!-- ================= 實際列印輸出的 A4 畫布 ================= -->
 <div id="print-preview-area">
     <div class="a4-page">
         <div class="half-sheet" id="print-slot-top"></div>
-        <div style="height: 11mm;"></div> <!-- 上下半部之間的完美物理間距 -->
         <div class="half-sheet" id="print-slot-bottom"></div>
     </div>
 </div>
@@ -187,28 +190,20 @@
 <script>
     const fields = ['year', 'month', 'day', 'weekday', 'weather', 'sales', 'visitors', 'avg_price', 'rate_day', 'market_day', 'rate_week', 'market_week', 'rate_month', 'market_month', 'rate_quarter', 'market_quarter', 'note1', 'note2', 'note3', 'note4', 'note5'];
 
-    // 頁面載入時初始化本機記憶與下拉選單
-    window.onload = function() {
-        refreshHistoryUI();
-    };
+    window.onload = function() { refreshHistoryUI(); };
 
-    // 取得當前輸入框的資料物件
     function getCurrentFormData() {
         let data = {};
         fields.forEach(f => data[f] = document.getElementById(f).value);
         return data;
     }
 
-    // 將資料塞入介面
     function setFormData(data) {
         fields.forEach(f => {
-            if(document.getElementById(f)) {
-                document.getElementById(f).value = data[f] || '';
-            }
+            if(document.getElementById(f)) document.getElementById(f).value = data[f] || '';
         });
     }
 
-    // 儲存至本機記憶庫 (LocalStorage)
     function saveToLocalStorage(data) {
         if(!data.month || !data.day) return;
         const key = `hola_${data.year || '115'}_${data.month}_${data.day}`;
@@ -216,7 +211,6 @@
         refreshHistoryUI();
     }
 
-    // 重新整理歷史選單
     function refreshHistoryUI() {
         const historyList = document.getElementById('historyList');
         const selectTop = document.getElementById('selectTopDate');
@@ -247,9 +241,8 @@
         alert("歷史資料載入成功！");
     }
 
-    // 產生表格 HTML 結構
     function generateTableHtml(data) {
-        if (!data || !data.day) return '<p style="text-align:center; color:#888;">(此格無資料)</p>';
+        if (!data || !data.day) return '<p style="text-align:center; color:#888; padding:20px;">(此格無資料)</p>';
         return `
         <table class="fake-table">
             <tr>
@@ -282,7 +275,7 @@
                 <td>大墩店 <span class="val-text">${data.rate_quarter || ''}</span> %</td>
                 <td>大盤 <span class="val-text">${data.market_quarter || ''}</span> %</td>
             </tr>
-            <tr><td colspan="5" style="letter-spacing: 5px;">宣達事項</td></tr>
+            <tr><td colspan="5" style="letter-spacing: 5px; height: 26px;">宣達事項</td></tr>
             <tr class="note-row"><td colspan="5">${data.note1 || ''}</td></tr>
             <tr class="note-row"><td colspan="5">${data.note2 || ''}</td></tr>
             <tr class="note-row"><td colspan="5">${data.note3 || ''}</td></tr>
@@ -291,7 +284,6 @@
         </table>`;
     }
 
-    // 更新螢幕預覽與列印畫布
     function updatePreview() {
         const topKey = document.getElementById('selectTopDate').value;
         const bottomKey = document.getElementById('selectBottomDate').value;
@@ -299,16 +291,13 @@
         const topData = topKey ? JSON.parse(localStorage.getItem(topKey)) : null;
         const bottomData = bottomKey ? JSON.parse(localStorage.getItem(bottomKey)) : null;
 
-        // 螢幕預覽
         document.getElementById('screen-preview-top').innerHTML = generateTableHtml(topData);
         document.getElementById('screen-preview-bottom').innerHTML = generateTableHtml(bottomData);
 
-        // 實際列印畫布
         document.getElementById('print-slot-top').innerHTML = generateTableHtml(topData);
         document.getElementById('print-slot-bottom').innerHTML = generateTableHtml(bottomData);
     }
 
-    // 發送資料到 GAS 同時存入本機記憶
     function submitData() {
         const btn = document.querySelector('.btn-submit');
         const originalText = btn.innerText;
@@ -316,18 +305,14 @@
         btn.disabled = true;
 
         const data = getCurrentFormData();
-        saveToLocalStorage(data); // 存入本機
+        saveToLocalStorage(data);
 
         const apiUrl = "https://script.google.com/macros/s/AKfycbyQGgZ6LC9FKhufestwrqodGNu2ZCHGVClWXb0qYnXopceRvlvQpLXXxB_ymoI9XybAfw/exec";
         
         const payload = new URLSearchParams();
         fields.forEach(f => payload.append(f, data[f]));
 
-        fetch(apiUrl, {
-            method: "POST",
-            mode: "no-cors",
-            body: payload
-        })
+        fetch(apiUrl, { method: "POST", mode: "no-cors", body: payload })
         .then(() => { 
             alert("資料已成功發射並暫存於本機記憶庫！"); 
             btn.innerText = originalText; 
@@ -338,7 +323,7 @@
             console.error(err);
             alert("靠杯，雲端連線失敗，但資料已暫存在本機。"); 
             btn.innerText = originalText; 
-            btn.disabled = false; 
+            btn.disabled, btn.disabled = false; 
         });
     }
 </script>
