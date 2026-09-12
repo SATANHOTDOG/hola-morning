@@ -3,70 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HOLA大墩 晨會靈魂超度儀表板 v3.2</title>
+    <title>HOLA大墩 晨會靈魂超度儀表板 v4.0</title>
     <style>
-        /* --- 螢幕看的高級 UI --- */
+        /* --- 螢幕操作介面 --- */
         body { font-family: "Microsoft JhengHei", sans-serif; background-color: #1e1e1e; color: #d4d4d4; margin: 0; padding: 20px; }
-        .container { max-width: 800px; margin: auto; background: #2d2d2d; padding: 20px; border-radius: 10px; border-top: 5px solid #007acc; }
+        .container { max-width: 800px; margin: auto; background: #2d2d2d; padding: 20px; border-radius: 10px; border-top: 5px solid #007acc; margin-bottom: 20px;}
         h2 { text-align: center; color: #569cd6; margin-top: 0; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 20px; }
-        .section-title { grid-column: 1 / -1; margin-top: 15px; border-bottom: 1px solid #444; padding-bottom: 5px; color: #c586c0; font-weight: bold; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 15px; }
+        .section-title { grid-column: 1 / -1; margin-top: 10px; border-bottom: 1px solid #444; padding-bottom: 5px; color: #c586c0; font-weight: bold; }
         label { display: block; font-size: 12px; margin-bottom: 2px; color: #9cdcfe; }
         input, select { width: 100%; padding: 8px; box-sizing: border-box; background: #1e1e1e; border: 1px solid #3c3c3c; color: #d4d4d4; border-radius: 4px; }
-        .btn-group { display: flex; gap: 10px; margin-top: 20px; }
-        button { flex: 1; padding: 15px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; color: white;}
+        .btn-group { display: flex; gap: 10px; margin-top: 15px; }
+        button { flex: 1; padding: 12px; font-size: 15px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; color: white;}
         .btn-submit { background: #007acc; }
         .btn-print { background: #4CAF50; }
-        .print-controls { background: #333; padding: 15px; border-radius: 5px; margin-bottom: 20px; text-align: center; border: 1px dashed #666; }
+        .btn-load { background: #d7ba7d; color: black; }
+        .control-panel { background: #252526; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #3c3c3c; }
+
+        /* --- A4 實體預覽與列印專用樣式 --- */
+        #print-preview-area { display: none; }
         
-        /* --- 偽造表格的基礎樣式 (只在螢幕隱藏，列印才出來) --- */
-        #fake-paper-container { display: none; }
-        .fake-table { width: 100%; border-collapse: collapse; border: 2px solid black; color: black; font-family: "Microsoft JhengHei", sans-serif; font-size: 14px; margin-bottom: 30px; background: white;}
-        .fake-table td, .fake-table th { border: 1px solid black; padding: 8px; text-align: center; height: 35px; }
-        .fake-table .note-row td { text-align: left; height: 30px; font-size: 13px; color: blue; font-family: 'Kaiti', '標楷體', serif; } 
-        .header-row { text-align: left !important; padding-left: 20px !important; font-size: 16px; }
-        
-        /* --- 列印結界 --- */
         @media print {
             body { background: none; color: black; padding: 0; margin: 0; }
-            .container, .print-controls { display: none !important; }
-            @page { size: A4; margin: 10mm; }
+            .no-print { display: none !important; }
+            #print-preview-area { display: block !important; }
+            @page { size: A4; margin: 5mm; }
 
-            /* 模式 A：隱形套印 (純數字漂浮) */
-            body.mode-overlay #print-inputs { display: block; }
-            body.mode-overlay input { border: none; background: transparent; padding: 0; color: blue !important; font-size: 16px; position: absolute; font-family: 'Kaiti', '標楷體', serif; font-weight: bold; }
-            
-            /* 上半部座標微調 */
-            #year { top: 18mm; left: 22mm; width: 15mm; } #month { top: 18mm; left: 45mm; width: 10mm; } #day { top: 18mm; left: 65mm; width: 10mm; } #weekday { top: 18mm; left: 105mm; width: 10mm; } #weather { top: 18mm; left: 145mm; width: 25mm; }
-            #sales { top: 38mm; left: 35mm; width: 25mm; } #visitors { top: 60mm; left: 35mm; width: 20mm; } #avg_price { top: 78mm; left: 35mm; width: 25mm; }
-            #rate_day { top: 31mm; left: 100mm; width: 15mm; } #rate_week { top: 44mm; left: 100mm; width: 15mm; } #rate_month { top: 56mm; left: 100mm; width: 15mm; } #rate_quarter { top: 68mm; left: 100mm; width: 15mm; }
-            #market_day { top: 31mm; left: 150mm; width: 15mm; } #market_week { top: 44mm; left: 150mm; width: 15mm; } #market_month { top: 56mm; left: 150mm; width: 15mm; } #market_quarter { top: 68mm; left: 150mm; width: 15mm; }
-            #note1 { top: 92mm; left: 15mm; width: 180mm; } #note2 { top: 102mm; left: 15mm; width: 180mm; } #note3 { top: 112mm; left: 15mm; width: 180mm; } #note4 { top: 122mm; left: 15mm; width: 180mm; } #note5 { top: 132mm; left: 15mm; width: 180mm; }
+            .a4-page {
+                width: 200mm;
+                height: 287mm;
+                margin: 0 auto;
+                position: relative;
+                page-break-after: always;
+                box-sizing: border-box;
+            }
 
-            /* 隱形套印 - 下半部偏移 */
-            body.mode-overlay.bottom-half #print-inputs { transform: translateY(145mm); }
+            .half-sheet {
+                height: 138mm;
+                position: relative;
+                overflow: hidden;
+            }
 
-            /* 模式 B：連框全印 (白紙造假) */
-            body.mode-full #print-inputs { display: none !important; }
-            body.mode-full #fake-paper-container { display: block; }
+            .fake-table {
+                width: 100%;
+                border-collapse: collapse;
+                border: 2px solid black;
+                color: black;
+                font-family: "Microsoft JhengHei", sans-serif;
+                font-size: 13px;
+                background: white;
+            }
+            .fake-table td, .fake-table th {
+                border: 1px solid black;
+                padding: 4px 6px;
+                text-align: center;
+                height: 26px;
+            }
+            .fake-table .note-row td {
+                text-align: left;
+                height: 24px;
+                font-size: 12px;
+                color: blue;
+                font-family: 'Kaiti', '標楷體', serif;
+            }
+            .header-row {
+                text-align: left !important;
+                padding-left: 15px !important;
+                font-size: 14px;
+            }
+            .val-text {
+                color: blue;
+                font-family: 'Kaiti', '標楷體', serif;
+                font-weight: bold;
+            }
         }
+
+        /* 螢幕上的預覽外觀 */
+        .preview-screen-box {
+            background: white;
+            color: black;
+            padding: 20px;
+            max-width: 800px;
+            margin: 20px auto;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        .screen-sheet {
+            border: 1px dashed #ccc;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        .screen-sheet h3 { margin: 0 0 10px 0; color: #666; font-size: 14px; }
     </style>
 </head>
 <body>
 
-<div class="print-controls">
-    <label style="font-size: 16px; color: white;">列印戰術選擇：</label>
-    <select id="printStrategy" style="font-size: 16px; font-weight: bold; padding: 8px; margin-top: 5px;">
-        <option value="full_top">📄 連框全印 (白紙) - 填上半部</option>
-        <option value="full_bottom">📄 連框全印 (白紙) - 填下半部</option>
-        <option value="overlay_top">👻 隱形套印 (公版紙) - 填上半部</option>
-        <option value="overlay_bottom">👻 隱形套印 (公版紙) - 填下半部</option>
-    </select>
-</div>
+<!-- 控制台與輸入介面 -->
+<div class="container no-print">
+    <h2>HOLA 晨會資料注射器 v4.0</h2>
+    
+    <div class="control-panel">
+        <div style="font-weight: bold; margin-bottom: 8px; color: #d7ba7d;">📂 歷史記憶庫 (免寫後端查詢)</div>
+        <div style="display: flex; gap: 10px;">
+            <select id="historyList" style="flex: 2;"><option value="">-- 選擇先前暫存的日期紀錄 --</option></select>
+            <button class="btn-load" onclick="loadHistoryData()">載入此筆資料</button>
+        </div>
+    </div>
 
-<!-- ================= 這裡是你平常輸入的介面 ================= -->
-<div class="container" id="print-inputs">
-    <h2>晨會資料注射器 v3.2</h2>
     <div class="grid">
         <div class="section-title">時空與環境</div>
         <div><label>年(ex:115)</label><input type="text" id="year" value="115"></div>
@@ -91,143 +134,194 @@
         <div><label>大盤季</label><input type="text" id="market_quarter"></div>
 
         <div class="section-title">長官宣達事項</div>
-        <div style="grid-column: 1 / -1;"><input type="text" id="note1"></div>
-        <div style="grid-column: 1 / -1;"><input type="text" id="note2"></div>
-        <div style="grid-column: 1 / -1;"><input type="text" id="note3"></div>
-        <div style="grid-column: 1 / -1;"><input type="text" id="note4"></div>
-        <div style="grid-column: 1 / -1;"><input type="text" id="note5"></div>
+        <div style="grid-column: 1 / -1;"><input type="text" id="note1" placeholder="第一行..."></div>
+        <div style="grid-column: 1 / -1;"><input type="text" id="note2" placeholder="第二行..."></div>
+        <div style="grid-column: 1 / -1;"><input type="text" id="note3" placeholder="第三行..."></div>
+        <div style="grid-column: 1 / -1;"><input type="text" id="note4" placeholder="第四行..."></div>
+        <div style="grid-column: 1 / -1;"><input type="text" id="note5" placeholder="第五行..."></div>
     </div>
+
     <div class="btn-group">
-        <button class="btn-submit" onclick="submitData()">發送至資料庫</button>
-        <button class="btn-print" onclick="executePrint()">開始列印</button>
+        <button class="btn-submit" onclick="submitData()">發送至資料庫並存入本機記憶</button>
     </div>
 </div>
 
-<!-- ================= 這裡是用來騙長官的全框造假 A4 紙 ================= -->
-<div id="fake-paper-container">
-    <!-- 上半部表格 -->
-    <table class="fake-table" id="table-top">
-        <tr>
-            <td colspan="5" class="header-row">
-                <span class="v-year"></span> 年 <span class="v-month"></span> 月 <span class="v-day"></span> 日 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 星期：<span class="v-weekday"></span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 天氣：<span class="v-weather"></span>
-            </td>
-        </tr>
-        <tr>
-            <td rowspan="4" style="width: 50px;">昨<br>日<br>業<br>績</td>
-            <td style="width: 150px; text-align:left;">大墩店 <span class="v-sales" style="color:blue;"></span> 萬</td>
-            <td style="width: 100px;">日達成率</td>
-            <td>大墩店 <span class="v-rate_day" style="color:blue;"></span> %</td>
-            <td>大盤 <span class="v-market_day" style="color:blue;"></span> %</td>
-        </tr>
-        <tr>
-            <td style="text-align:left;">來客數：<span class="v-visitors" style="color:blue;"></span> 人</td>
-            <td>週達成率</td>
-            <td>大墩店 <span class="v-rate_week" style="color:blue;"></span> %</td>
-            <td>大盤 <span class="v-market_week" style="color:blue;"></span> %</td>
-        </tr>
-        <tr>
-            <td style="text-align:left;">客單價：<span class="v-avg_price" style="color:blue;"></span> 元</td>
-            <td>月達成率</td>
-            <td>大墩店 <span class="v-rate_month" style="color:blue;"></span> %</td>
-            <td>大盤 <span class="v-market_month" style="color:blue;"></span> %</td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>季達成率</td>
-            <td>大墩店 <span class="v-rate_quarter" style="color:blue;"></span> %</td>
-            <td>大盤 <span class="v-market_quarter" style="color:blue;"></span> %</td>
-        </tr>
-        <tr><td colspan="5" style="letter-spacing: 5px;">宣達事項</td></tr>
-        <tr class="note-row"><td colspan="5" class="v-note1"></td></tr>
-        <tr class="note-row"><td colspan="5" class="v-note2"></td></tr>
-        <tr class="note-row"><td colspan="5" class="v-note3"></td></tr>
-        <tr class="note-row"><td colspan="5" class="v-note4"></td></tr>
-        <tr class="note-row"><td colspan="5" class="v-note5"></td></tr>
-    </table>
+<!-- 雙日拼接選擇控制台 -->
+<div class="container no-print" style="border-top-color: #4CAF50;">
+    <h2>🖨️ A4 雙日智慧套印控制台</h2>
+    <div class="grid">
+        <div>
+            <label>【上半部】選擇要印的日期</label>
+            <select id="selectTopDate" onchange="updatePreview()"><option value="">-- 選擇日期 --</option></select>
+        </div>
+        <div>
+            <label>【下半部】選擇要印的日期</label>
+            <select id="selectBottomDate" onchange="updatePreview()"><option value="">-- 選擇日期 --</option></select>
+        </div>
+    </div>
+    
+    <!-- 螢幕即時預覽區 -->
+    <div class="preview-screen-box">
+        <div class="screen-sheet">
+            <h3>🖥️ A4 上半部預覽</h3>
+            <div id="screen-preview-top">（尚未選擇資料）</div>
+        </div>
+        <div class="screen-sheet">
+            <h3>🖥️ A4 下半部預覽</h3>
+            <div id="screen-preview-bottom">（尚未選擇資料）</div>
+        </div>
+    </div>
 
-    <!-- 下半部表格 (一模一樣) -->
-    <table class="fake-table" id="table-bottom">
-        <tr>
-            <td colspan="5" class="header-row">
-                <span class="v-year"></span> 年 <span class="v-month"></span> 月 <span class="v-day"></span> 日 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 星期：<span class="v-weekday"></span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 天氣：<span class="v-weather"></span>
-            </td>
-        </tr>
-        <tr>
-            <td rowspan="4" style="width: 50px;">昨<br>日<br>業<br>績</td>
-            <td style="width: 150px; text-align:left;">大墩店 <span class="v-sales" style="color:blue;"></span> 萬</td>
-            <td style="width: 100px;">日達成率</td>
-            <td>大墩店 <span class="v-rate_day" style="color:blue;"></span> %</td>
-            <td>大盤 <span class="v-market_day" style="color:blue;"></span> %</td>
-        </tr>
-        <tr>
-            <td style="text-align:left;">來客數：<span class="v-visitors" style="color:blue;"></span> 人</td>
-            <td>週達成率</td>
-            <td>大墩店 <span class="v-rate_week" style="color:blue;"></span> %</td>
-            <td>大盤 <span class="v-market_week" style="color:blue;"></span> %</td>
-        </tr>
-        <tr>
-            <td style="text-align:left;">客單價：<span class="v-avg_price" style="color:blue;"></span> 元</td>
-            <td>月達成率</td>
-            <td>大墩店 <span class="v-rate_month" style="color:blue;"></span> %</td>
-            <td>大盤 <span class="v-market_month" style="color:blue;"></span> %</td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>季達成率</td>
-            <td>大墩店 <span class="v-rate_quarter" style="color:blue;"></span> %</td>
-            <td>大盤 <span class="v-market_quarter" style="color:blue;"></span> %</td>
-        </tr>
-        <tr><td colspan="5" style="letter-spacing: 5px;">宣達事項</td></tr>
-        <tr class="note-row"><td colspan="5" class="v-note1"></td></tr>
-        <tr class="note-row"><td colspan="5" class="v-note2"></td></tr>
-        <tr class="note-row"><td colspan="5" class="v-note3"></td></tr>
-        <tr class="note-row"><td colspan="5" class="v-note4"></td></tr>
-        <tr class="note-row"><td colspan="5" class="v-note5"></td></tr>
-    </table>
+    <button class="btn-print" onclick="window.print()" style="width: 100%; padding: 15px; font-size: 18px;">🖨️ 確認無誤，開始列印整張 A4</button>
+</div>
+
+<!-- ================= 實際列印輸出的隱形 A4畫布 ================= -->
+<div id="print-preview-area">
+    <div class="a4-page">
+        <div class="half-sheet" id="print-slot-top"></div>
+        <div style="height: 11mm;"></div> <!-- 上下半部之間的完美物理間距 -->
+        <div class="half-sheet" id="print-slot-bottom"></div>
+    </div>
 </div>
 
 <script>
     const fields = ['year', 'month', 'day', 'weekday', 'weather', 'sales', 'visitors', 'avg_price', 'rate_day', 'market_day', 'rate_week', 'market_week', 'rate_month', 'market_month', 'rate_quarter', 'market_quarter', 'note1', 'note2', 'note3', 'note4', 'note5'];
 
-    function executePrint() {
-        const strategy = document.getElementById('printStrategy').value;
-        document.body.className = ''; 
+    // 頁面載入時初始化本機記憶與下拉選單
+    window.onload = function() {
+        refreshHistoryUI();
+    };
 
-        if (strategy.includes('full')) {
-            document.body.classList.add('mode-full');
-            document.querySelectorAll('.fake-table span, .fake-table .note-row td').forEach(el => el.innerText = '');
-            
-            const targetTableId = strategy === 'full_top' ? 'table-top' : 'table-bottom';
-            const targetTable = document.getElementById(targetTableId);
-            
-            fields.forEach(f => {
-                const val = document.getElementById(f).value;
-                const targetCells = targetTable.querySelectorAll(`.v-${f}`);
-                targetCells.forEach(cell => cell.innerText = val);
-            });
-        } else {
-            document.body.classList.add('mode-overlay');
-            if (strategy === 'overlay_bottom') {
-                document.body.classList.add('bottom-half');
-            }
-        }
-        
-        window.print();
+    // 取得當前輸入框的資料物件
+    function getCurrentFormData() {
+        let data = {};
+        fields.forEach(f => data[f] = document.getElementById(f).value);
+        return data;
     }
 
-    // 採用 no-cors 強行通關，完美避開 Google 跨域阻擋
+    // 將資料塞入介面
+    function setFormData(data) {
+        fields.forEach(f => {
+            if(document.getElementById(f)) {
+                document.getElementById(f).value = data[f] || '';
+            }
+        });
+    }
+
+    // 儲存至本機記憶庫 (LocalStorage)
+    function saveToLocalStorage(data) {
+        if(!data.month || !data.day) return;
+        const key = `hola_${data.year || '115'}_${data.month}_${data.day}`;
+        localStorage.setItem(key, JSON.stringify(data));
+        refreshHistoryUI();
+    }
+
+    // 重新整理歷史選單
+    function refreshHistoryUI() {
+        const historyList = document.getElementById('historyList');
+        const selectTop = document.getElementById('selectTopDate');
+        const selectBottom = document.getElementById('selectBottomDate');
+        
+        let optionsHtml = '<option value="">-- 選擇先前暫存的日期紀錄 --</option>';
+        let selectOptionsHtml = '<option value="">-- 選擇日期 --</option>';
+        
+        let keys = Object.keys(localStorage).filter(k => k.startsWith('hola_')).sort().reverse();
+        
+        keys.forEach(k => {
+            let data = JSON.parse(localStorage.getItem(k));
+            let label = `${data.year}年${data.month}月${data.day}日 (業績:${data.sales}萬)`;
+            optionsHtml += `<option value="${k}">${label}</option>`;
+            selectOptionsHtml += `<option value="${k}">${label}</option>`;
+        });
+
+        historyList.innerHTML = optionsHtml;
+        selectTop.innerHTML = selectOptionsHtml;
+        selectBottom.innerHTML = selectOptionsHtml;
+    }
+
+    function loadHistoryData() {
+        const key = document.getElementById('historyList').value;
+        if(!key) return;
+        const data = JSON.parse(localStorage.getItem(key));
+        setFormData(data);
+        alert("歷史資料載入成功！");
+    }
+
+    // 產生表格 HTML 結構
+    function generateTableHtml(data) {
+        if (!data || !data.day) return '<p style="text-align:center; color:#888;">(此格無資料)</p>';
+        return `
+        <table class="fake-table">
+            <tr>
+                <td colspan="5" class="header-row">
+                    <span class="val-text">${data.year || ''}</span> 年 <span class="val-text">${data.month || ''}</span> 月 <span class="val-text">${data.day || ''}</span> 日 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 星期：<span class="val-text">${data.weekday || ''}</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 天氣：<span class="val-text">${data.weather || ''}</span>
+                </td>
+            </tr>
+            <tr>
+                <td rowspan="4" style="width: 45px;">昨<br>日<br>業<br>績</td>
+                <td style="width: 140px; text-align:left;">大墩店 <span class="val-text">${data.sales || ''}</span> 萬</td>
+                <td style="width: 90px;">日達成率</td>
+                <td>大墩店 <span class="val-text">${data.rate_day || ''}</span> %</td>
+                <td>大盤 <span class="val-text">${data.market_day || ''}</span> %</td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">來客數：<span class="val-text">${data.visitors || ''}</span> 人</td>
+                <td>週達成率</td>
+                <td>大墩店 <span class="val-text">${data.rate_week || ''}</span> %</td>
+                <td>大盤 <span class="val-text">${data.market_week || ''}</span> %</td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">客單價：<span class="val-text">${data.avg_price || ''}</span> 元</td>
+                <td>月達成率</td>
+                <td>大墩店 <span class="val-text">${data.rate_month || ''}</span> %</td>
+                <td>大盤 <span class="val-text">${data.market_month || ''}</span> %</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>季達成率</td>
+                <td>大墩店 <span class="val-text">${data.rate_quarter || ''}</span> %</td>
+                <td>大盤 <span class="val-text">${data.market_quarter || ''}</span> %</td>
+            </tr>
+            <tr><td colspan="5" style="letter-spacing: 5px;">宣達事項</td></tr>
+            <tr class="note-row"><td colspan="5">${data.note1 || ''}</td></tr>
+            <tr class="note-row"><td colspan="5">${data.note2 || ''}</td></tr>
+            <tr class="note-row"><td colspan="5">${data.note3 || ''}</td></tr>
+            <tr class="note-row"><td colspan="5">${data.note4 || ''}</td></tr>
+            <tr class="note-row"><td colspan="5">${data.note5 || ''}</td></tr>
+        </table>`;
+    }
+
+    // 更新螢幕預覽與列印畫布
+    function updatePreview() {
+        const topKey = document.getElementById('selectTopDate').value;
+        const bottomKey = document.getElementById('selectBottomDate').value;
+
+        const topData = topKey ? JSON.parse(localStorage.getItem(topKey)) : null;
+        const bottomData = bottomKey ? JSON.parse(localStorage.getItem(bottomKey)) : null;
+
+        // 螢幕預覽
+        document.getElementById('screen-preview-top').innerHTML = generateTableHtml(topData);
+        document.getElementById('screen-preview-bottom').innerHTML = generateTableHtml(bottomData);
+
+        // 實際列印畫布
+        document.getElementById('print-slot-top').innerHTML = generateTableHtml(topData);
+        document.getElementById('print-slot-bottom').innerHTML = generateTableHtml(bottomData);
+    }
+
+    // 發送資料到 GAS 同時存入本機記憶
     function submitData() {
         const btn = document.querySelector('.btn-submit');
         const originalText = btn.innerText;
         btn.innerText = "資料通靈中...";
         btn.disabled = true;
 
+        const data = getCurrentFormData();
+        saveToLocalStorage(data); // 存入本機
+
         const apiUrl = "https://script.google.com/macros/s/AKfycbyQGgZ6LC9FKhufestwrqodGNu2ZCHGVClWXb0qYnXopceRvlvQpLXXxB_ymoI9XybAfw/exec";
         
         const payload = new URLSearchParams();
-        fields.forEach(f => {
-            payload.append(f, document.getElementById(f).value);
-        });
+        fields.forEach(f => payload.append(f, data[f]));
 
         fetch(apiUrl, {
             method: "POST",
@@ -235,13 +329,14 @@
             body: payload
         })
         .then(() => { 
-            alert("資料已發射！(請直接去 Google 試算表確認業績有沒有進去)"); 
+            alert("資料已成功發射並暫存於本機記憶庫！"); 
             btn.innerText = originalText; 
             btn.disabled = false; 
+            updatePreview();
         })
         .catch(err => { 
             console.error(err);
-            alert("靠杯，連線真的出事了。"); 
+            alert("靠杯，雲端連線失敗，但資料已暫存在本機。"); 
             btn.innerText = originalText; 
             btn.disabled = false; 
         });
