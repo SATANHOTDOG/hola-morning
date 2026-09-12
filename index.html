@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HOLA大墩 晨會靈魂超度儀表板 v3.1</title>
+    <title>HOLA大墩 晨會靈魂超度儀表板 v3.2</title>
     <style>
         /* --- 螢幕看的高級 UI --- */
         body { font-family: "Microsoft JhengHei", sans-serif; background-color: #1e1e1e; color: #d4d4d4; margin: 0; padding: 20px; }
@@ -66,7 +66,7 @@
 
 <!-- ================= 這裡是你平常輸入的介面 ================= -->
 <div class="container" id="print-inputs">
-    <h2>晨會資料注射器 v3.1</h2>
+    <h2>晨會資料注射器 v3.2</h2>
     <div class="grid">
         <div class="section-title">時空與環境</div>
         <div><label>年(ex:115)</label><input type="text" id="year" value="115"></div>
@@ -215,7 +215,7 @@
         window.print();
     }
 
-    // 使用土炮 URLSearchParams 戰術，徹底粉碎 Google CORS 阻擋
+    // 採用 no-cors 強行通關，完美避開 Google 跨域阻擋
     function submitData() {
         const btn = document.querySelector('.btn-submit');
         const originalText = btn.innerText;
@@ -231,20 +231,17 @@
 
         fetch(apiUrl, {
             method: "POST",
-            body: payload,
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded"
-            }
+            mode: "no-cors",
+            body: payload
         })
-        .then(res => res.json())
-        .then(data => { 
-            alert(data.result); 
+        .then(() => { 
+            alert("資料已發射！(請直接去 Google 試算表確認業績有沒有進去)"); 
             btn.innerText = originalText; 
             btn.disabled = false; 
         })
         .catch(err => { 
             console.error(err);
-            alert("靠杯，連線失敗。請確認 GAS 是否有重新部署並建立新版本！"); 
+            alert("靠杯，連線真的出事了。"); 
             btn.innerText = originalText; 
             btn.disabled = false; 
         });
