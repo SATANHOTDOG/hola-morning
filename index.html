@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HOLA大墩 晨會靈魂超度儀表板 v4.1</title>
+    <title>HOLA大墩 晨會靈魂超度儀表板 v4.2</title>
     <style>
         /* --- 螢幕操作介面 --- */
         body { font-family: "Microsoft JhengHei", sans-serif; background-color: #1e1e1e; color: #d4d4d4; margin: 0; padding: 20px; }
@@ -18,9 +18,10 @@
         .btn-submit { background: #007acc; }
         .btn-print { background: #4CAF50; }
         .btn-load { background: #d7ba7d; color: black; }
+        .btn-sync { background: #569cd6; color: white; }
         .control-panel { background: #252526; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #3c3c3c; }
 
-        /* --- A4 實體預覽與列印專用樣式 (完美契合原版比例) --- */
+        /* --- A4 實體預覽與列印專用樣式 --- */
         #print-preview-area { display: none; }
         
         @media print {
@@ -38,7 +39,7 @@
                 box-sizing: border-box;
                 display: flex;
                 flex-direction: column;
-                justify-content: space-between; /* 讓上下兩半部完美撐開對齊原版 */
+                justify-content: space-between;
             }
 
             .half-sheet {
@@ -62,7 +63,6 @@
                 text-align: center;
                 height: 28px;
             }
-            /* 讓宣達事項的空白行高拉開，跟原版紙張一致 */
             .fake-table .note-row td {
                 text-align: left;
                 height: 32px;
@@ -83,7 +83,6 @@
             }
         }
 
-        /* 螢幕上的預覽外觀 */
         .preview-screen-box {
             background: white;
             color: black;
@@ -105,13 +104,16 @@
 
 <!-- 控制台與輸入介面 -->
 <div class="container no-print">
-    <h2>HOLA 晨會資料注射器 v4.1</h2>
+    <h2>HOLA 晨會資料注射器 v4.2</h2>
     
     <div class="control-panel">
-        <div style="font-weight: bold; margin-bottom: 8px; color: #d7ba7d;">📂 歷史記憶庫</div>
+        <div style="font-weight: bold; margin-bottom: 8px; color: #d7ba7d;">☁️ 雲端歷史資料同步中心</div>
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <button class="btn-sync" onclick="fetchCloudHistory()">🔄 從 Google 試算表同步最新資料</button>
+        </div>
         <div style="display: flex; gap: 10px;">
-            <select id="historyList" style="flex: 2;"><option value="">-- 選擇先前暫存的日期紀錄 --</option></select>
-            <button class="btn-load" onclick="loadHistoryData()">載入此筆資料</button>
+            <select id="historyList" style="flex: 2;"><option value="">-- 請先點上方按鈕同步資料 --</option></select>
+            <button class="btn-load" onclick="loadHistoryData()">載入選取紀錄</button>
         </div>
     </div>
 
@@ -147,7 +149,7 @@
     </div>
 
     <div class="btn-group">
-        <button class="btn-submit" onclick="submitData()">發送至資料庫並存入本機記憶</button>
+        <button class="btn-submit" onclick="submitData()">發送至雲端資料庫</button>
     </div>
 </div>
 
@@ -156,12 +158,12 @@
     <h2>🖨️ A4 雙日智慧套印控制台</h2>
     <div class="grid">
         <div>
-            <label>【上半部】選擇要印的日期</label>
-            <select id="selectTopDate" onchange="updatePreview()"><option value="">-- 選擇日期 --</option></select>
+            <label>【上半部】選擇日期</label>
+            <select id="selectTopDate" onchange="updatePreview()"><option value="">-- 請先同步雲端資料 --</option></select>
         </div>
         <div>
-            <label>【下半部】選擇要印的日期</label>
-            <select id="selectBottomDate" onchange="updatePreview()"><option value="">-- 選擇日期 --</option></select>
+            <label>【下半部】選擇日期</label>
+            <select id="selectBottomDate" onchange="updatePreview()"><option value="">-- 請先同步雲端資料 --</option></select>
         </div>
     </div>
     
@@ -179,7 +181,7 @@
     <button class="btn-print" onclick="window.print()" style="width: 100%; padding: 15px; font-size: 18px;">🖨️ 確認無誤，開始列印精準 A4 版面</button>
 </div>
 
-<!-- ================= 實際列印輸出的 A4 畫布 ================= -->
+<!-- 實際列印輸出的 A4 畫布 -->
 <div id="print-preview-area">
     <div class="a4-page">
         <div class="half-sheet" id="print-slot-top"></div>
@@ -189,8 +191,14 @@
 
 <script>
     const fields = ['year', 'month', 'day', 'weekday', 'weather', 'sales', 'visitors', 'avg_price', 'rate_day', 'market_day', 'rate_week', 'market_week', 'rate_month', 'market_month', 'rate_quarter', 'market_quarter', 'note1', 'note2', 'note3', 'note4', 'note5'];
+    
+    let cloudDataStore = []; // 存放從雲端抓回來的資料陣列
+    const apiUrl = "https://script.google.com/macros/s/AKfycbyQGgZ6LC9FKhufestwrqodGNu2ZCHGVClWXb0qYnXopceRvlvQpLXXxB_ymoI9XybAfw/exec";
 
-    window.onload = function() { refreshHistoryUI(); };
+    // 頁面一開好，自動嘗試同步雲端
+    window.onload = function() {
+        fetchCloudHistory();
+    };
 
     function getCurrentFormData() {
         let data = {};
@@ -204,40 +212,47 @@
         });
     }
 
-    function saveToLocalStorage(data) {
-        if(!data.month || !data.day) return;
-        const key = `hola_${data.year || '115'}_${data.month}_${data.day}`;
-        localStorage.setItem(key, JSON.stringify(data));
-        refreshHistoryUI();
+    // 從 Google 試算表同步歷史資料
+    function fetchCloudHistory() {
+        const syncBtn = document.querySelector('.btn-sync');
+        syncBtn.innerText = "🔄 正在同步雲端資料...";
+        
+        fetch(apiUrl)
+        .then(res => res.json())
+        .then(data => {
+            cloudDataStore = data;
+            populateDropdowns(data);
+            syncBtn.innerText = "🔄 從 Google 試算表同步最新資料 (同步成功！)";
+            setTimeout(() => { syncBtn.innerText = "🔄 從 Google 試算表同步最新資料"; }, 3000);
+        })
+        .catch(err => {
+            console.error(err);
+            syncBtn.innerText = "❌ 同步失敗 (請檢查網路或 GAS)";
+        });
     }
 
-    function refreshHistoryUI() {
+    // 填入所有下拉選單
+    function populateDropdowns(dataList) {
         const historyList = document.getElementById('historyList');
         const selectTop = document.getElementById('selectTopDate');
         const selectBottom = document.getElementById('selectBottomDate');
         
-        let optionsHtml = '<option value="">-- 選擇先前暫存的日期紀錄 --</option>';
-        let selectOptionsHtml = '<option value="">-- 選擇日期 --</option>';
+        let optionsHtml = '<option value="">-- 選擇歷史紀錄 --</option>';
         
-        let keys = Object.keys(localStorage).filter(k => k.startsWith('hola_')).sort().reverse();
-        
-        keys.forEach(k => {
-            let data = JSON.parse(localStorage.getItem(k));
-            let label = `${data.year}年${data.month}月${data.day}日 (業績:${data.sales}萬)`;
-            optionsHtml += `<option value="${k}">${label}</option>`;
-            selectOptionsHtml += `<option value="${k}">${label}</option>`;
+        dataList.forEach((item, index) => {
+            let label = `${item.year || '115'}年${item.month}月${item.day}日 (業績:${item.sales}萬)`;
+            optionsHtml += `<option value="${index}">${label}</option>`;
         });
 
         historyList.innerHTML = optionsHtml;
-        selectTop.innerHTML = selectOptionsHtml;
-        selectBottom.innerHTML = selectOptionsHtml;
+        selectTop.innerHTML = optionsHtml;
+        selectBottom.innerHTML = optionsHtml;
     }
 
     function loadHistoryData() {
-        const key = document.getElementById('historyList').value;
-        if(!key) return;
-        const data = JSON.parse(localStorage.getItem(key));
-        setFormData(data);
+        const index = document.getElementById('historyList').value;
+        if(index === "") return;
+        setFormData(cloudDataStore[index]);
         alert("歷史資料載入成功！");
     }
 
@@ -285,11 +300,11 @@
     }
 
     function updatePreview() {
-        const topKey = document.getElementById('selectTopDate').value;
-        const bottomKey = document.getElementById('selectBottomDate').value;
+        const topIdx = document.getElementById('selectTopDate').value;
+        const bottomIdx = document.getElementById('selectBottomDate').value;
 
-        const topData = topKey ? JSON.parse(localStorage.getItem(topKey)) : null;
-        const bottomData = bottomKey ? JSON.parse(localStorage.getItem(bottomKey)) : null;
+        const topData = topIdx !== "" ? cloudDataStore[topIdx] : null;
+        const bottomData = bottomIdx !== "" ? cloudDataStore[bottomIdx] : null;
 
         document.getElementById('screen-preview-top').innerHTML = generateTableHtml(topData);
         document.getElementById('screen-preview-bottom').innerHTML = generateTableHtml(bottomData);
@@ -301,29 +316,26 @@
     function submitData() {
         const btn = document.querySelector('.btn-submit');
         const originalText = btn.innerText;
-        btn.innerText = "資料通靈中...";
+        btn.innerText = "資料發射中...";
         btn.disabled = true;
 
         const data = getCurrentFormData();
-        saveToLocalStorage(data);
-
-        const apiUrl = "https://script.google.com/macros/s/AKfycbyQGgZ6LC9FKhufestwrqodGNu2ZCHGVClWXb0qYnXopceRvlvQpLXXxB_ymoI9XybAfw/exec";
-        
         const payload = new URLSearchParams();
         fields.forEach(f => payload.append(f, data[f]));
 
         fetch(apiUrl, { method: "POST", mode: "no-cors", body: payload })
         .then(() => { 
-            alert("資料已成功發射並暫存於本機記憶庫！"); 
+            alert("資料已成功發射至 Google 試算表！"); 
             btn.innerText = originalText; 
             btn.disabled = false; 
-            updatePreview();
+            // 發射後自動重新同步一次雲端
+            fetchCloudHistory();
         })
         .catch(err => { 
             console.error(err);
-            alert("靠杯，雲端連線失敗，但資料已暫存在本機。"); 
+            alert("靠杯，雲端連線失敗。"); 
             btn.innerText = originalText; 
-            btn.disabled, btn.disabled = false; 
+            btn.disabled = false; 
         });
     }
 </script>
