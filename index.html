@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='110' fill='%231e1e1e'/%3E%3Ccircle cx='256' cy='256' r='90' fill='%23ffa726'/%3E%3Cg stroke='%23ffa726' stroke-width='32' stroke-linecap='round'%3E%3Cline x1='256' y1='64' x2='256' y2='112'/%3E%3Cline x1='256' y1='400' x2='256' y2='448'/%3E%3Cline x1='64' y1='256' x2='112' y2='256'/%3E%3Cline x1='400' y1='256' x2='448' y2='256'/%3E%3Cline x1='120' y1='120' x2='154' y2='154'/%3E%3Cline x1='358' y1='358' x2='392' y2='392'/%3E%3Cline x1='120' y1='392' x2='154' y2='358'/%3E%3Cline x1='358' y1='154' x2='392' y2='120'/%3E%3C/g%3E%3C/svg%3E">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='110' fill='%231e1e1e'/%3E%3Ccircle cx='256' cy='256' r='90' fill='%23ffa726'/%3E%3Cg stroke='%23ffa726' stroke-width='32' stroke-linecap='round'%3E%3Cline x1='256' y1='64' x2='256' y2='112'/%3E%3Cline x1='256' y1='400' x2='256' y2='448'/%3E%3Cline x1='64' y1='256' x2='112' y2='256'/%3E%3Cline x1='400' y1='256' x2='448' y2='256'/%3E%3Cline x1='120' y1='120' x2='154' y2='154'/%3E%3Cline x1='358' y1='358' x2='392' y2='392'/%3E%3Cline x1='120' y1='392' x2='154' y2='358'/%3E%3Cline x1='358' y1='154' x2='392' y2='120'/%3E%3C/g%3E%3C/svg%3E" type="image/svg+xml">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HOLA大墩 晨會靈魂超度儀表板 v4.2</title>
+    <title>HOLA大墩 早午會資料發射器 v4.3</title>
+    
+    <!-- 晨會專屬太陽標誌 -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='110' fill='%231e1e1e'/%3E%3Ccircle cx='256' cy='256' r='90' fill='%23ffa726'/%3E%3Cg stroke='%23ffa726' stroke-width='32' stroke-linecap='round'%3E%3Cline x1='256' y1='64' x2='256' y2='112'/%3E%3Cline x1='256' y1='400' x2='256' y2='448'/%3E%3Cline x1='64' y1='256' x2='112' y2='256'/%3E%3Cline x1='400' y1='256' x2='448' y2='256'/%3E%3Cline x1='120' y1='120' x2='154' y2='154'/%3E%3Cline x1='358' y1='358' x2='392' y2='392'/%3E%3Cline x1='120' y1='392' x2='154' y2='358'/%3E%3Cline x1='358' y1='154' x2='392' y2='120'/%3E%3C/g%3E%3C/svg%3E">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='110' fill='%231e1e1e'/%3E%3Ccircle cx='256' cy='256' r='90' fill='%23ffa726'/%3E%3Cg stroke='%23ffa726' stroke-width='32' stroke-linecap='round'%3E%3Cline x1='256' y1='64' x2='256' y2='112'/%3E%3Cline x1='256' y1='400' x2='256' y2='448'/%3E%3Cline x1='64' y1='256' x2='112' y2='256'/%3E%3Cline x1='400' y1='256' x2='448' y2='256'/%3E%3Cline x1='120' y1='120' x2='154' y2='154'/%3E%3Cline x1='358' y1='358' x2='392' y2='392'/%3E%3Cline x1='120' y1='392' x2='154' y2='358'/%3E%3Cline x1='358' y1='154' x2='392' y2='120'/%3E%3C/g%3E%3C/svg%3E" type="image/svg+xml">
+
     <style>
         /* --- 螢幕操作介面 --- */
         body { font-family: "Microsoft JhengHei", sans-serif; background-color: #1e1e1e; color: #d4d4d4; margin: 0; padding: 20px; }
@@ -106,7 +109,7 @@
 
 <!-- 控制台與輸入介面 -->
 <div class="container no-print">
-    <h2>HOLA 早午會資料發射器 </h2>
+    <h2>HOLA 早午會資料發射器</h2>
     
     <div class="control-panel">
         <div style="font-weight: bold; margin-bottom: 8px; color: #d7ba7d;">☁️ 雲端歷史資料同步中心</div>
@@ -133,14 +136,14 @@
         <div><label>客單價</label><input type="text" id="avg_price"></div>
 
         <div class="section-title">達成率大逃殺 (%)</div>
-        <div><label>日達成率</label><input type="text" id="rate_day"></div>
-        <div><label>大盤日</label><input type="text" id="market_day"></div>
-        <div><label>週達成率</label><input type="text" id="rate_week"></div>
-        <div><label>大盤週</label><input type="text" id="market_week"></div>
-        <div><label>月達成率</label><input type="text" id="rate_month"></div>
-        <div><label>大盤月</label><input type="text" id="market_month"></div>
-        <div><label>季達成率</label><input type="text" id="rate_quarter"></div>
-        <div><label>大盤季</label><input type="text" id="market_quarter"></div>
+        <div><label>日達成率(大墩)</label><input type="text" id="rate_day"></div>
+        <div><label>日達成率(大盤)</label><input type="text" id="market_day"></div>
+        <div><label>週達成率(大墩)</label><input type="text" id="rate_week"></div>
+        <div><label>週達成率(大盤)</label><input type="text" id="market_week"></div>
+        <div><label>月達成率(大墩)</label><input type="text" id="rate_month"></div>
+        <div><label>月達成率(大盤)</label><input type="text" id="market_month"></div>
+        <div><label>季達成率(大墩)</label><input type="text" id="rate_quarter"></div>
+        <div><label>季達成率(大盤)</label><input type="text" id="market_quarter"></div>
 
         <div class="section-title">宣達事項</div>
         <div style="grid-column: 1 / -1;"><input type="text" id="note1" placeholder="第一行..."></div>
@@ -194,10 +197,9 @@
 <script>
     const fields = ['year', 'month', 'day', 'weekday', 'weather', 'sales', 'visitors', 'avg_price', 'rate_day', 'market_day', 'rate_week', 'market_week', 'rate_month', 'market_month', 'rate_quarter', 'market_quarter', 'note1', 'note2', 'note3', 'note4', 'note5'];
     
-    let cloudDataStore = []; // 存放從雲端抓回來的資料陣列
+    let cloudDataStore = [];
     const apiUrl = "https://script.google.com/macros/s/AKfycbyQGgZ6LC9FKhufestwrqodGNu2ZCHGVClWXb0qYnXopceRvlvQpLXXxB_ymoI9XybAfw/exec";
 
-    // 頁面一開好，自動嘗試同步雲端
     window.onload = function() {
         fetchCloudHistory();
     };
@@ -214,7 +216,6 @@
         });
     }
 
-    // 從 Google 試算表同步歷史資料
     function fetchCloudHistory() {
         const syncBtn = document.querySelector('.btn-sync');
         syncBtn.innerText = "🔄 正在同步雲端資料...";
@@ -233,7 +234,6 @@
         });
     }
 
-    // 填入所有下拉選單
     function populateDropdowns(dataList) {
         const historyList = document.getElementById('historyList');
         const selectTop = document.getElementById('selectTopDate');
@@ -263,41 +263,47 @@
         return `
         <table class="fake-table">
             <tr>
-                <td colspan="5" class="header-row">
+                <td colspan="4" class="header-row">
                     <span class="val-text">${data.year || ''}</span> 年 <span class="val-text">${data.month || ''}</span> 月 <span class="val-text">${data.day || ''}</span> 日 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 星期：<span class="val-text">${data.weekday || ''}</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 天氣：<span class="val-text">${data.weather || ''}</span>
                 </td>
             </tr>
             <tr>
-                <td rowspan="4" style="width: 45px;">昨<br>日<br>業<br>績</td>
-                <td style="width: 140px; text-align:left;">大墩店 <span class="val-text">${data.sales || ''}</span> 萬</td>
+                <td rowspan="4" style="width: 140px; vertical-align: middle;">
+                    昨日業績
+                </td>
+                <td colspan="3" style="text-align: left; padding-left: 15px; height: 110px; vertical-align: top; line-height: 2.2;">
+                    大墩店 <span class="val-text">${data.sales || ''}</span> 萬<br>
+                    來客數：<span class="val-text">${data.visitors || ''}</span> 人<br>
+                    客單價：<span class="val-text">${data.avg_price || ''}</span> 元
+                </td>
+            </tr>
+            <tr>
                 <td style="width: 90px;">日達成率</td>
-                <td>大墩店 <span class="val-text">${data.rate_day || ''}</span> %</td>
-                <td>大盤 <span class="val-text">${data.market_day || ''}</span> %</td>
+                <td style="text-align: left; padding-left: 10px;">大墩店 <span class="val-text">${data.rate_day || ''}</span> %</td>
+                <td style="text-align: left; padding-left: 10px;">大盤 <span class="val-text">${data.market_day || ''}</span> %</td>
             </tr>
             <tr>
-                <td style="text-align:left;">來客數：<span class="val-text">${data.visitors || ''}</span> 人</td>
                 <td>週達成率</td>
-                <td>大墩店 <span class="val-text">${data.rate_week || ''}</span> %</td>
-                <td>大盤 <span class="val-text">${data.market_week || ''}</span> %</td>
+                <td style="text-align: left; padding-left: 10px;">大墩店 <span class="val-text">${data.rate_week || ''}</span> %</td>
+                <td style="text-align: left; padding-left: 10px;">大盤 <span class="val-text">${data.market_week || ''}</span> %</td>
             </tr>
             <tr>
-                <td style="text-align:left;">客單價：<span class="val-text">${data.avg_price || ''}</span> 元</td>
                 <td>月達成率</td>
-                <td>大墩店 <span class="val-text">${data.rate_month || ''}</span> %</td>
-                <td>大盤 <span class="val-text">${data.market_month || ''}</span> %</td>
+                <td style="text-align: left; padding-left: 10px;">大墩店 <span class="val-text">${data.rate_month || ''}</span> %</td>
+                <td style="text-align: left; padding-left: 10px;">大盤 <span class="val-text">${data.market_month || ''}</span> %</td>
             </tr>
             <tr>
-                <td></td>
-                <td>季達成率</td>
-                <td>大墩店 <span class="val-text">${data.rate_quarter || ''}</span> %</td>
-                <td>大盤 <span class="val-text">${data.market_quarter || ''}</span> %</td>
+                <td style="vertical-align: middle;">季達成率</td>
+                <td colspan="3" style="text-align: left; padding-left: 10px;">
+                    大墩店 <span class="val-text">${data.rate_quarter || ''}</span> % &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 大盤 <span class="val-text">${data.market_quarter || ''}</span> %
+                </td>
             </tr>
-            <tr><td colspan="5" style="letter-spacing: 5px; height: 26px;">宣達事項</td></tr>
-            <tr class="note-row"><td colspan="5">${data.note1 || ''}</td></tr>
-            <tr class="note-row"><td colspan="5">${data.note2 || ''}</td></tr>
-            <tr class="note-row"><td colspan="5">${data.note3 || ''}</td></tr>
-            <tr class="note-row"><td colspan="5">${data.note4 || ''}</td></tr>
-            <tr class="note-row"><td colspan="5">${data.note5 || ''}</td></tr>
+            <tr><td colspan="4" style="letter-spacing: 5px; height: 26px; text-align: center;">宣達事項</td></tr>
+            <tr class="note-row"><td colspan="4">${data.note1 || ''}</td></tr>
+            <tr class="note-row"><td colspan="4">${data.note2 || ''}</td></tr>
+            <tr class="note-row"><td colspan="4">${data.note3 || ''}</td></tr>
+            <tr class="note-row"><td colspan="4">${data.note4 || ''}</td></tr>
+            <tr class="note-row"><td colspan="4">${data.note5 || ''}</td></tr>
         </table>`;
     }
 
@@ -330,7 +336,6 @@
             alert("資料已成功發射至 Google 試算表！"); 
             btn.innerText = originalText; 
             btn.disabled = false; 
-            // 發射後自動重新同步一次雲端
             fetchCloudHistory();
         })
         .catch(err => { 
