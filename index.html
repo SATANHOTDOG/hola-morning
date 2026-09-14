@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HOLA大墩 早午會資料發射器 v4.6</title>
+    <title>HOLA大墩 早午會資料發射器 v4.7</title>
     
     <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='110' fill='%231e1e1e'/%3E%3Ccircle cx='256' cy='256' r='90' fill='%23ffa726'/%3E%3Cg stroke='%23ffa726' stroke-width='32' stroke-linecap='round'%3E%3Cline x1='256' y1='64' x2='256' y2='112'/%3E%3Cline x1='256' y1='400' x2='256' y2='448'/%3E%3Cline x1='64' y1='256' x2='112' y2='256'/%3E%3Cline x1='400' y1='256' x2='448' y2='256'/%3E%3Cline x1='120' y1='120' x2='154' y2='154'/%3E%3Cline x1='358' y1='358' x2='392' y2='392'/%3E%3Cline x1='120' y1='392' x2='154' y2='358'/%3E%3Cline x1='358' y1='154' x2='392' y2='120'/%3E%3C/g%3E%3C/svg%3E">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='110' fill='%231e1e1e'/%3E%3Ccircle cx='256' cy='256' r='90' fill='%23ffa726'/%3E%3Cg stroke='%23ffa726' stroke-width='32' stroke-linecap='round'%3E%3Cline x1='256' y1='64' x2='256' y2='112'/%3E%3Cline x1='256' y1='400' x2='256' y2='448'/%3E%3Cline x1='64' y1='256' x2='112' y2='256'/%3E%3Cline x1='400' y1='256' x2='448' y2='256'/%3E%3Cline x1='120' y1='120' x2='154' y2='154'/%3E%3Cline x1='358' y1='358' x2='392' y2='392'/%3E%3Cline x1='120' y1='392' x2='154' y2='358'/%3E%3Cline x1='358' y1='154' x2='392' y2='120'/%3E%3C/g%3E%3C/svg%3E" type="image/svg+xml">
 
     <style>
-        /* --- 螢幕操作介面 --- */
         body { font-family: "Microsoft JhengHei", sans-serif; background-color: #1e1e1e; color: #d4d4d4; margin: 0; padding: 20px; }
         .container { max-width: 800px; margin: auto; background: #2d2d2d; padding: 20px; border-radius: 10px; border-top: 5px solid #007acc; margin-bottom: 20px;}
         h2 { text-align: center; color: #569cd6; margin-top: 0; }
@@ -25,7 +24,6 @@
         .btn-sync { background: #569cd6; color: white; }
         .control-panel { background: #252526; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #3c3c3c; }
 
-        /* --- A4 實體預覽與列印專用樣式 --- */
         #print-preview-area { display: none; }
         
         @media print {
@@ -46,7 +44,6 @@
                 justify-content: space-between;
             }
 
-            /* 把高度鎖死在半張紙，讓裡面的 table 100% 撐滿 */
             .half-sheet {
                 height: 135mm;
                 width: 100%;
@@ -56,7 +53,7 @@
 
             .fake-table {
                 width: 100%;
-                height: 100%; /* 強制表格撐滿 135mm，消滅空白 */
+                height: 100%; 
                 border-collapse: collapse;
                 border: 2px solid black;
                 color: black;
@@ -256,48 +253,53 @@
 
     function generateTableHtml(data) {
         if (!data || !data.day) return '<p style="text-align:center; color:#888; padding:20px;">(此格無資料)</p>';
-        // 嚴格對齊原版：左邊 rowspan=4，右邊標準3欄 (標題、大墩、大盤)
+        
+        // 修正為 4 欄結構，完美重現公版
         return `
         <table class="fake-table">
             <tr style="height: 12%;">
-                <td colspan="5" class="header-row">
+                <td colspan="4" class="header-row">
                     <span class="val-text">${data.year || ''}</span> 年 <span class="val-text">${data.month || ''}</span> 月 <span class="val-text">${data.day || ''}</span> 日 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 星期：<span class="val-text">${data.weekday || ''}</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 天氣：<span class="val-text">${data.weather || ''}</span>
                 </td>
             </tr>
             <tr style="height: 8.5%;">
                 <td rowspan="4" style="width: 10%; vertical-align: middle; text-align: center;">昨<br>日<br>業<br>績</td>
-                <td rowspan="4" style="width: 32%; text-align: left; vertical-align: top; padding-left: 15px; padding-top: 10px; line-height: 2.2;">
-                    大墩店 <span class="val-text">${data.sales || ''}</span> 萬<br>
-                    來客數：<span class="val-text">${data.visitors || ''}</span> 人<br>
-                    客單價：<span class="val-text">${data.avg_price || ''}</span> 元
+                <td rowspan="4" style="width: 35%; text-align: left; vertical-align: middle; padding: 0 15px;">
+                    <div style="margin-bottom: 8px;"><span style="display:inline-block; width: 45px; text-align: justify; text-align-last: justify;">大墩店</span>：<span class="val-text" style="display:inline-block; width: 65px; text-align:right; margin-right: 5px;">${data.sales || ''}</span> 萬</div>
+                    <div style="margin-bottom: 8px;"><span style="display:inline-block; width: 45px; text-align: justify; text-align-last: justify;">來客數</span>：<span class="val-text" style="display:inline-block; width: 65px; text-align:right; margin-right: 5px;">${data.visitors || ''}</span> 人</div>
+                    <div><span style="display:inline-block; width: 45px; text-align: justify; text-align-last: justify;">客單價</span>：<span class="val-text" style="display:inline-block; width: 65px; text-align:right; margin-right: 5px;">${data.avg_price || ''}</span> 元</div>
                 </td>
-                <td style="width: 18%;">日達成率</td>
-                <td style="width: 20%; text-align: left; padding-left: 10px;">大墩店 <span class="val-text">${data.rate_day || ''}</span> %</td>
-                <td style="width: 20%; text-align: left; padding-left: 10px;">大盤 <span class="val-text">${data.market_day || ''}</span> %</td>
+                <td style="width: 15%;">日達成率</td>
+                <td style="width: 40%; text-align: left; padding-left: 15px;">
+                    大墩店 <span class="val-text" style="display:inline-block; width: 45px; text-align:center;">${data.rate_day || ''}</span> % &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 大盤 <span class="val-text" style="display:inline-block; width: 45px; text-align:center;">${data.market_day || ''}</span> %
+                </td>
             </tr>
             <tr style="height: 8.5%;">
                 <td>週達成率</td>
-                <td style="text-align: left; padding-left: 10px;">大墩店 <span class="val-text">${data.rate_week || ''}</span> %</td>
-                <td style="text-align: left; padding-left: 10px;">大盤 <span class="val-text">${data.market_week || ''}</span> %</td>
+                <td style="text-align: left; padding-left: 15px;">
+                    大墩店 <span class="val-text" style="display:inline-block; width: 45px; text-align:center;">${data.rate_week || ''}</span> % &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 大盤 <span class="val-text" style="display:inline-block; width: 45px; text-align:center;">${data.market_week || ''}</span> %
+                </td>
             </tr>
             <tr style="height: 8.5%;">
                 <td>月達成率</td>
-                <td style="text-align: left; padding-left: 10px;">大墩店 <span class="val-text">${data.rate_month || ''}</span> %</td>
-                <td style="text-align: left; padding-left: 10px;">大盤 <span class="val-text">${data.market_month || ''}</span> %</td>
+                <td style="text-align: left; padding-left: 15px;">
+                    大墩店 <span class="val-text" style="display:inline-block; width: 45px; text-align:center;">${data.rate_month || ''}</span> % &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 大盤 <span class="val-text" style="display:inline-block; width: 45px; text-align:center;">${data.market_month || ''}</span> %
+                </td>
             </tr>
             <tr style="height: 8.5%;">
                 <td>季達成率</td>
-                <td style="text-align: left; padding-left: 10px;">大墩店 <span class="val-text">${data.rate_quarter || ''}</span> %</td>
-                <td style="text-align: left; padding-left: 10px;">大盤 <span class="val-text">${data.market_quarter || ''}</span> %</td>
+                <td style="text-align: left; padding-left: 15px;">
+                    大墩店 <span class="val-text" style="display:inline-block; width: 45px; text-align:center;">${data.rate_quarter || ''}</span> % &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 大盤 <span class="val-text" style="display:inline-block; width: 45px; text-align:center;">${data.market_quarter || ''}</span> %
+                </td>
             </tr>
             <tr style="height: 9%;">
-                <td colspan="5" style="letter-spacing: 5px; text-align: center;">宣達事項</td>
+                <td colspan="4" style="letter-spacing: 5px; text-align: center;">宣達事項</td>
             </tr>
-            <tr class="note-row" style="height: 9%;"><td colspan="5">${data.note1 || ''}</td></tr>
-            <tr class="note-row" style="height: 9%;"><td colspan="5">${data.note2 || ''}</td></tr>
-            <tr class="note-row" style="height: 9%;"><td colspan="5">${data.note3 || ''}</td></tr>
-            <tr class="note-row" style="height: 9%;"><td colspan="5">${data.note4 || ''}</td></tr>
-            <tr class="note-row" style="height: 9%;"><td colspan="5">${data.note5 || ''}</td></tr>
+            <tr class="note-row" style="height: 9.4%;"><td colspan="4">${data.note1 || ''}</td></tr>
+            <tr class="note-row" style="height: 9.4%;"><td colspan="4">${data.note2 || ''}</td></tr>
+            <tr class="note-row" style="height: 9.4%;"><td colspan="4">${data.note3 || ''}</td></tr>
+            <tr class="note-row" style="height: 9.4%;"><td colspan="4">${data.note4 || ''}</td></tr>
+            <tr class="note-row" style="height: 9.4%;"><td colspan="4">${data.note5 || ''}</td></tr>
         </table>`;
     }
 
